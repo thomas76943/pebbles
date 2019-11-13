@@ -9,21 +9,22 @@ public class PebbleGame {
     public static void main(String[] args) throws InterruptedException {
 
         final PebbleGame game = new PebbleGame();
-        int players = 0;
+        int playerNum = 0;
+        int p;
 
         Scanner input = new Scanner(System.in);
         System.out.println("Enter Number of Players:  ");
         try {
             String inputLine = input.nextLine();
             //checkExit(inputLine);
-            players = Integer.parseInt(inputLine);
+            playerNum = Integer.parseInt(inputLine);
         }
         catch (NumberFormatException e) {
             System.out.println("Input Invalid. Must be Integer");
         }
 
-        for (int i = 1; i <= players; i++) {
-            Player player = new Player(game, i, players);
+        for (int i = 1; i <= playerNum; i++) {
+            Player player = new Player(game, i, playerNum);
             Thread playerThread = new Thread(player);
             playerThread.start();
         }
