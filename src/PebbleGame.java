@@ -12,6 +12,7 @@ public class PebbleGame {
         int playerNum = 0;
         int p;
         int o;
+        int q;
 
         Scanner input = new Scanner(System.in);
         System.out.println("Enter Number of Players:  ");
