@@ -1,7 +1,13 @@
+import java.util.ArrayList;
+
 class WhiteBag extends Bag {
 
-    int p;
-    int q;
+
+
+    public WhiteBag(ArrayList<Integer> contents) {
+        super(contents);
+    }
+
     public void addToWhite() {
 
     }

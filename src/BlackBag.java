@@ -2,14 +2,19 @@ import java.util.ArrayList;
 
 class BlackBag extends Bag {
 
-    public Bag linkedbag;
-    int p;
-    int q;
-    public BlackBag(ArrayList<Integer> contents, WhiteBag wbag1) {
+    private WhiteBag linkedWhite;
 
+    public BlackBag(ArrayList<Integer> contents, WhiteBag linkedWhite) {
+        super(contents);
+        this.linkedWhite = linkedWhite;
     }
 
     public void drawFromBlack() {
 
     }
+
+    public WhiteBag getLinkedWhite() {
+        return linkedWhite;
+    }
+
 }
