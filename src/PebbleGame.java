@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -17,15 +18,16 @@ public class PebbleGame {
     private WhiteBag wb0;
     private WhiteBag wb1;
     private WhiteBag wb2;
-
+    private HashMap<Integer, BlackBag> lastBlackUsed = new HashMap<Integer, BlackBag>();
 
     public static void main(String[] args) throws InterruptedException {
 
         final PebbleGame game = new PebbleGame();
         int playerNum = 0;
 
+
         Scanner input = new Scanner(System.in);
-        System.out.println("Enter Number of Players:  ");
+        System.out.println("Enter Number of Players: ");
         try {
             String inputLine = input.nextLine();
             if (inputLine.equalsIgnoreCase("e")) {
@@ -49,28 +51,66 @@ public class PebbleGame {
     }
 
     public void takeTurn(Player player) {
-        //if hand empty, take 10 pebbles from random black bag
-        System.out.println(this.currentPlayer + " is taking a turn. Hand: " + player.hand);
-        /*
+
         Random r = new Random();
 
-        switch (r.nextInt(3)) {
-
-            case 0:
-                bb0.drawFromBlack();
-                break;
-            case 1:
-                bb1.drawFromBlack();
-                break;
-            case 2:
-                bb2.drawFromBlack();
-                break;
-
+        if (player.hand.size() != 0) {
+            int index = r.nextInt(player.hand.size());
+            int pebble = player.hand.get(index);
+            player.hand.remove(index);
+            BlackBag bb = lastBlackUsed.get(player.state);
+            WhiteBag wb = bb.getLinkedWhite();
+            wb.addToWhite(wb.getContents(), pebble);
         }
-        */
-        if (player.hand.size() == 0)
-        {
 
+        switch (r.nextInt(3)) {
+            case 0:
+                if (player.hand.size() == 0) {
+                    for (int i = 0; i < 10; i++) {
+                        int pebble = bb0.drawFromBlack();
+                        player.hand.add(pebble);
+                    }
+                    lastBlackUsed.put(player.state, bb0);
+                }
+                else {
+                    int pebble = bb0.drawFromBlack();
+                    player.hand.add(pebble);
+                    lastBlackUsed.put(player.state, bb0);
+                }
+                System.out.println(this.currentPlayer + " is taking a turn. Bag Chosen: 0. Hand: " + player.hand);
+                break;
+
+            case 1:
+                if (player.hand.size() == 0) {
+                    for (int i = 0; i < 10; i++) {
+                        int pebble = bb1.drawFromBlack();
+                        player.hand.add(pebble);
+                    }
+                    lastBlackUsed.put(player.state, bb1);
+                }
+                else {
+                    int pebble = bb1.drawFromBlack();
+                    player.hand.add(pebble);
+                    lastBlackUsed.put(player.state, bb1);
+                }
+                System.out.println(this.currentPlayer + " is taking a turn. Bag Chosen: 1. Hand: " + player.hand);
+                break;
+
+            case 2:
+                if (player.hand.size() == 0) {
+                    for (int i = 0; i < 10; i++) {
+                        int pebble = bb2.drawFromBlack();
+                        player.hand.add(pebble);
+                    }
+                    lastBlackUsed.put(player.state, bb2);;
+                }
+                else {
+                    int pebble = bb2.drawFromBlack();
+                    player.hand.add(pebble);
+                    lastBlackUsed.put(player.state, bb2);
+                }
+                System.out.println(this.currentPlayer + " is taking a turn. Bag Chosen: 2. Hand: " + player.hand);
+                break;
         }
 
         if(checkWin(player.hand)) {
@@ -187,13 +227,13 @@ public class PebbleGame {
             contents2.add(range2.get(randomIndex2));
         }
 
-        bb0 = new BlackBag(contents0, wb0);
-        bb1 = new BlackBag(contents1, wb1);
-        bb2 = new BlackBag(contents2, wb2);
-
         wb0 = new WhiteBag(new ArrayList<Integer>());
         wb1 = new WhiteBag(new ArrayList<Integer>());
         wb2 = new WhiteBag(new ArrayList<Integer>());
+
+        bb0 = new BlackBag(contents0, wb0);
+        bb1 = new BlackBag(contents1, wb1);
+        bb2 = new BlackBag(contents2, wb2);
 
         System.out.println(bb0.getContents());
         System.out.println(bb1.getContents());
@@ -216,7 +256,6 @@ public class PebbleGame {
             this.game = game;
             this.state = state;
             this.maxplayers = maxplayers;
-            hand.add(state);
             this.hand = hand;
         }
 
