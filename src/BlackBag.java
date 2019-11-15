@@ -1,3 +1,5 @@
+import javax.swing.text.AbstractDocument;
+import java.io.Console;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -11,6 +13,15 @@ class BlackBag extends Bag {
     }
 
     public int drawFromBlack() {
+
+
+        if (contents.size() == 0) {
+            System.out.println("Contents of White: " + linkedWhite.contents);
+            fillBlackFromWhite();
+            System.out.println("Refilled. Contents of White: " + linkedWhite.contents);
+
+            fillBlackFromWhite();
+        }
         Random r = new Random();
         int index = r.nextInt(contents.size());
         int pebble = contents.get(index);
@@ -20,9 +31,15 @@ class BlackBag extends Bag {
     }
 
     public WhiteBag getLinkedWhite() {
-
         return linkedWhite;
+    }
 
+    public void fillBlackFromWhite() {
+
+        for (int x : linkedWhite.contents) {
+            contents.add(x);
+        }
+        linkedWhite.contents.clear();
     }
 
 }

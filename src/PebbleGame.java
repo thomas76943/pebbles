@@ -122,11 +122,13 @@ public class PebbleGame {
 
     public boolean checkWin(ArrayList<Integer> hand) {
         int total = 0;
-        for (int i = 0; i <= hand.size()-1; i++) {
+        for (int i = 0; i <= hand.size() - 1; i++) {
             total += hand.get(i);
         }
-        if (total == 100)
+        if (total == 250) {
+            System.out.println("CheckWin(): Game Over");
             return true;
+        }
         return false;
     }
 
@@ -260,8 +262,7 @@ public class PebbleGame {
         }
 
         public void run() {
-            boolean x = true;
-            while (x) {  //check game is not won
+            while (!(game.checkWin(this.hand))) {  //check game is not won
                 if (this.state == game.currentPlayer.get()) { //if it is current players turn
                     synchronized (game) { //locking game object to you, nobody else has access
                         try {

@@ -6,9 +6,6 @@ class WhiteBag extends Bag {
         super(contents);
     }
 
-    public void emptyToBlack() {
-    }
-
     public void addToWhite(ArrayList<Integer> contents, int pebble) {
         contents.add(pebble);
     }
