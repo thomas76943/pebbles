@@ -14,7 +14,6 @@ class BlackBag extends Bag {
 
     public int drawFromBlack() {
 
-
         if (contents.size() == 0) {
             fillBlackFromWhite();
             System.out.println("Black Bag " + this.getBagName() + " Refilled");

@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class PebbleGame {
 
     AtomicInteger currentPlayer = new AtomicInteger(1);
+    private volatile boolean gameWon = false;
     private BlackBag bb0;
     private BlackBag bb1;
     private BlackBag bb2;
@@ -87,6 +88,7 @@ public class PebbleGame {
                     writeToFile(player, pebble, bb0);
                 }
                 System.out.println("Player " + this.currentPlayer + "'s turn. BlackBag0 chosen. Hand: " + player.hand);
+                checkWin(player);
                 break;
 
             case 1:
@@ -104,6 +106,7 @@ public class PebbleGame {
                     writeToFile(player, pebble, bb1);
                 }
                 System.out.println("Player " + this.currentPlayer + "'s turn. BlackBag1 chosen. Hand: " + player.hand);
+                checkWin(player);
                 break;
 
             case 2:
@@ -121,6 +124,7 @@ public class PebbleGame {
                     writeToFile(player, pebble, bb2);
                 }
                 System.out.println("Player " + this.currentPlayer + "'s turn. BlackBag2 chosen. Hand: " + player.hand);
+                checkWin(player);
                 break;
         }
 
@@ -154,11 +158,10 @@ public class PebbleGame {
             total += player.hand.get(i);
         }
         if (total == 100) {
-            System.out.println("Player " + player.playerNum + " has won");
-            System.out.println("Hand: " + player.hand);
-            return true;
+            System.out.println("Player " + player.playerNum + " has won. Hand: " + player.hand);
+            return gameWon = true;
         }
-        return false;
+        return gameWon = false;
     }
 
     public void getBagFileLocations(int playerNum) {
@@ -283,9 +286,9 @@ public class PebbleGame {
         }
 
         public void run() {
-            while (!(game.checkWin(this))) {  //check game is not won
-                if (!(game.checkWin(this)) && this.playerNum == game.currentPlayer.get()) { //if it is current players turn
-                    synchronized (game) { //locking game object to you, nobody else has access
+            while (!(game.gameWon)) {  //check game is not won
+                if (this.playerNum == game.currentPlayer.get()) { //if it is current players turn
+                    synchronized (game) { //locking game object to current player, nobody else has access
                         try {
                             game.takeTurn(this); //main gameplay
                             game.currentPlayer.getAndIncrement(); //next player set
