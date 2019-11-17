@@ -1,7 +1,7 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -11,7 +11,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class PebbleGame {
 
     AtomicInteger currentPlayer = new AtomicInteger(1);
-    volatile boolean gameWon = false;
     private BlackBag bb0;
     private BlackBag bb1;
     private BlackBag bb2;
@@ -20,11 +19,10 @@ public class PebbleGame {
     private WhiteBag wb2;
     private HashMap<Integer, BlackBag> lastBlackUsed = new HashMap<Integer, BlackBag>();
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, IOException {
 
         final PebbleGame game = new PebbleGame();
         int playerNum = 0;
-
 
         Scanner input = new Scanner(System.in);
         System.out.println("Enter Number of Players: ");
@@ -43,11 +41,20 @@ public class PebbleGame {
         game.getBagFileLocations(playerNum);
 
         for (int i = 1; i <= playerNum; i++) {
-            Player player = new Player(game, i, playerNum);
+
+            String outputFileName = "player" + i + "_output.txt";
+            Player player = new Player(game, i, playerNum, outputFileName);
             Thread playerThread = new Thread(player);
             playerThread.start();
-        }
 
+            try {
+                FileOutputStream fos = new FileOutputStream(outputFileName);
+                OutputStreamWriter osw = new OutputStreamWriter(fos, "utf-8");
+                Writer writer = new BufferedWriter(osw);
+            } catch (IOException e) {
+                System.out.println("Could not create Output File");
+            }
+        }
     }
 
     public void takeTurn(Player player) {
@@ -58,9 +65,10 @@ public class PebbleGame {
             int index = r.nextInt(player.hand.size());
             int pebble = player.hand.get(index);
             player.hand.remove(index);
-            BlackBag bb = lastBlackUsed.get(player.state);
+            BlackBag bb = lastBlackUsed.get(player.playerNum);
             WhiteBag wb = bb.getLinkedWhite();
-            wb.addToWhite(wb.getContents(), pebble);
+            wb.addToWhite(pebble);
+            writeToFile(player, pebble, wb);
         }
 
         switch (r.nextInt(3)) {
@@ -70,12 +78,13 @@ public class PebbleGame {
                         int pebble = bb0.drawFromBlack();
                         player.hand.add(pebble);
                     }
-                    lastBlackUsed.put(player.state, bb0);
+                    lastBlackUsed.put(player.playerNum, bb0);
                 }
                 else {
                     int pebble = bb0.drawFromBlack();
                     player.hand.add(pebble);
-                    lastBlackUsed.put(player.state, bb0);
+                    lastBlackUsed.put(player.playerNum, bb0);
+                    writeToFile(player, pebble, bb0);
                 }
                 System.out.println(this.currentPlayer + " is taking a turn. Bag Chosen: 0. Hand: " + player.hand);
                 break;
@@ -86,12 +95,13 @@ public class PebbleGame {
                         int pebble = bb1.drawFromBlack();
                         player.hand.add(pebble);
                     }
-                    lastBlackUsed.put(player.state, bb1);
+                    lastBlackUsed.put(player.playerNum, bb1);
                 }
                 else {
                     int pebble = bb1.drawFromBlack();
                     player.hand.add(pebble);
-                    lastBlackUsed.put(player.state, bb1);
+                    lastBlackUsed.put(player.playerNum, bb1);
+                    writeToFile(player, pebble, bb1);
                 }
                 System.out.println(this.currentPlayer + " is taking a turn. Bag Chosen: 1. Hand: " + player.hand);
                 break;
@@ -102,36 +112,54 @@ public class PebbleGame {
                         int pebble = bb2.drawFromBlack();
                         player.hand.add(pebble);
                     }
-                    lastBlackUsed.put(player.state, bb2);;
+                    lastBlackUsed.put(player.playerNum, bb2);;
                 }
                 else {
                     int pebble = bb2.drawFromBlack();
                     player.hand.add(pebble);
-                    lastBlackUsed.put(player.state, bb2);
+                    lastBlackUsed.put(player.playerNum, bb2);
+                    writeToFile(player, pebble, bb2);
                 }
                 System.out.println(this.currentPlayer + " is taking a turn. Bag Chosen: 2. Hand: " + player.hand);
                 break;
         }
 
-        if(checkWin(player.hand)) {
-            System.out.println("Player: " + player.state + "has won");
-            gameWon = true;
-        }
-
     }
 
-    public boolean checkWin(ArrayList<Integer> hand) {
-        int total = 0;
-        for (int i = 0; i <= hand.size() - 1; i++) {
-            total += hand.get(i);
+    private void writeToFile(Player player, int pebble, Bag bag) {
+
+        String moveLog = "";
+        String handLog = "player" + player.playerNum + " hand is " + player.hand + "\n";
+
+        if (bag instanceof BlackBag) {
+            moveLog = "player" + player.playerNum + " has drawn a " + pebble + " from bag " + bag.getBagName() + "\n";
+
         }
-        if (total == 250) {
-            System.out.println("CheckWin(): Game Over");
+        else if (bag instanceof WhiteBag) {
+            moveLog = "player" + player.playerNum + " has discarded a " + pebble + " to bag " + bag.getBagName() + "\n";
+        }
+
+        try {
+            Files.write(Paths.get(player.outputFileName), moveLog.getBytes(), StandardOpenOption.APPEND);
+            Files.write(Paths.get(player.outputFileName), handLog.getBytes(), StandardOpenOption.APPEND);
+
+        } catch (IOException e) {
+            System.out.println("Could not read move to file");
+        }
+    }
+
+    public boolean checkWin(Player player) {
+        int total = 0;
+        for (int i = 0; i <= player.hand.size() - 1; i++) {
+            total += player.hand.get(i);
+        }
+        if (total == 100) {
+            System.out.println("Player " + player.playerNum + " has won");
+            System.out.println("Hand: " + player.hand);
             return true;
         }
         return false;
     }
-
 
     public void getBagFileLocations(int playerNum) {
 
@@ -229,46 +257,39 @@ public class PebbleGame {
             contents2.add(range2.get(randomIndex2));
         }
 
-        wb0 = new WhiteBag(new ArrayList<Integer>());
-        wb1 = new WhiteBag(new ArrayList<Integer>());
-        wb2 = new WhiteBag(new ArrayList<Integer>());
+        wb0 = new WhiteBag(new ArrayList<Integer>(), "wb0");
+        wb1 = new WhiteBag(new ArrayList<Integer>(), "wb1");
+        wb2 = new WhiteBag(new ArrayList<Integer>(), "wb2");
 
-        bb0 = new BlackBag(contents0, wb0);
-        bb1 = new BlackBag(contents1, wb1);
-        bb2 = new BlackBag(contents2, wb2);
-
-        System.out.println(bb0.getContents());
-        System.out.println(bb1.getContents());
-        System.out.println(bb2.getContents());
-
-        System.out.println(wb0.getContents());
-        System.out.println(wb1.getContents());
-        System.out.println(wb2.getContents());
-
+        bb0 = new BlackBag(contents0, "bb0", wb0);
+        bb1 = new BlackBag(contents1, "bb1", wb1);
+        bb2 = new BlackBag(contents2, "bb2", wb2);
     }
 
     public static class Player implements Runnable {
 
         PebbleGame game;
-        private int state;
-        private int maxplayers;
+        private int playerNum;
+        private int maxPlayers;
+        private String outputFileName;
         private ArrayList<Integer> hand = new ArrayList<Integer>();
 
-        public Player (PebbleGame game, int state, int maxplayers) {
+        public Player (PebbleGame game, int playerNum, int maxPlayers, String outputFileName) {
             this.game = game;
-            this.state = state;
-            this.maxplayers = maxplayers;
+            this.playerNum = playerNum;
+            this.maxPlayers = maxPlayers;
+            this.outputFileName = outputFileName;
             this.hand = hand;
         }
 
         public void run() {
-            while (!(game.checkWin(this.hand))) {  //check game is not won
-                if (this.state == game.currentPlayer.get()) { //if it is current players turn
+            while (!(game.checkWin(this))) {  //check game is not won
+                if (this.playerNum == game.currentPlayer.get()) { //if it is current players turn
                     synchronized (game) { //locking game object to you, nobody else has access
                         try {
                             game.takeTurn(this); //main gameplay
                             game.currentPlayer.getAndIncrement(); //next player set
-                            if (this.state == this.maxplayers) { //check if last player
+                            if (this.playerNum == this.maxPlayers) { //check if last player
                                 game.currentPlayer.set(1); //reset to player 1
                                 game.notifyAll(); //releases lock, all threads awake
                             }
@@ -276,7 +297,7 @@ public class PebbleGame {
                                 game.wait(); //if not last play and taken turn, release lock on game object
                             }
                         } catch (InterruptedException e) {
-                            System.out.println("Thread Finished");
+                            System.out.println("Thread Finished: InterruptedException");
                             e.printStackTrace();
                         }
                     }

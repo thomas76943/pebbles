@@ -7,8 +7,8 @@ class BlackBag extends Bag {
 
     private WhiteBag linkedWhite;
 
-    public BlackBag(ArrayList<Integer> contents, WhiteBag linkedWhite) {
-        super(contents);
+    public BlackBag(ArrayList<Integer> contents, String bagName, WhiteBag linkedWhite) {
+        super(contents, bagName);
         this.linkedWhite = linkedWhite;
     }
 
@@ -16,11 +16,8 @@ class BlackBag extends Bag {
 
 
         if (contents.size() == 0) {
-            System.out.println("Contents of White: " + linkedWhite.contents);
             fillBlackFromWhite();
-            System.out.println("Refilled. Contents of White: " + linkedWhite.contents);
-
-            fillBlackFromWhite();
+            System.out.println("Black Bag " + this.getBagName() + " Refilled");
         }
         Random r = new Random();
         int index = r.nextInt(contents.size());
