@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class PebbleGame {
 
-    AtomicInteger currentPlayer = new AtomicInteger(1);
+    private AtomicInteger currentPlayer = new AtomicInteger(1);
     private volatile boolean gameWon = false;
     private BlackBag bb0;
     private BlackBag bb1;
@@ -152,16 +152,16 @@ public class PebbleGame {
         }
     }
 
-    public boolean checkWin(Player player) {
+    public void checkWin(Player player) {
         int total = 0;
         for (int i = 0; i <= player.hand.size() - 1; i++) {
             total += player.hand.get(i);
         }
         if (total == 100) {
             System.out.println("Player " + player.playerNum + " has won. Hand: " + player.hand);
-            return gameWon = true;
+            gameWon = true;
         }
-        return gameWon = false;
+        gameWon = false;
     }
 
     public void getBagFileLocations(int playerNum) {
