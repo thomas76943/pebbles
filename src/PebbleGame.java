@@ -86,7 +86,7 @@ public class PebbleGame {
                     lastBlackUsed.put(player.playerNum, bb0);
                     writeToFile(player, pebble, bb0);
                 }
-                System.out.println(this.currentPlayer + " is taking a turn. Bag Chosen: 0. Hand: " + player.hand);
+                System.out.println("Player " + this.currentPlayer + "'s turn. BlackBag0 chosen. Hand: " + player.hand);
                 break;
 
             case 1:
@@ -103,7 +103,7 @@ public class PebbleGame {
                     lastBlackUsed.put(player.playerNum, bb1);
                     writeToFile(player, pebble, bb1);
                 }
-                System.out.println(this.currentPlayer + " is taking a turn. Bag Chosen: 1. Hand: " + player.hand);
+                System.out.println("Player " + this.currentPlayer + "'s turn. BlackBag1 chosen. Hand: " + player.hand);
                 break;
 
             case 2:
@@ -120,7 +120,7 @@ public class PebbleGame {
                     lastBlackUsed.put(player.playerNum, bb2);
                     writeToFile(player, pebble, bb2);
                 }
-                System.out.println(this.currentPlayer + " is taking a turn. Bag Chosen: 2. Hand: " + player.hand);
+                System.out.println("Player " + this.currentPlayer + "'s turn. BlackBag2 chosen. Hand: " + player.hand);
                 break;
         }
 
@@ -284,7 +284,7 @@ public class PebbleGame {
 
         public void run() {
             while (!(game.checkWin(this))) {  //check game is not won
-                if (this.playerNum == game.currentPlayer.get()) { //if it is current players turn
+                if (!(game.checkWin(this)) && this.playerNum == game.currentPlayer.get()) { //if it is current players turn
                     synchronized (game) { //locking game object to you, nobody else has access
                         try {
                             game.takeTurn(this); //main gameplay
