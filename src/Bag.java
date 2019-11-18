@@ -17,4 +17,5 @@ public class Bag {
     public String getBagName() {
         return bagName;
     }
+
 }
