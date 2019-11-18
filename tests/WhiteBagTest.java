@@ -3,11 +3,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
-public class BagTest {
+public class WhiteBagTest {
 
     @Before
     public void setUp() throws Exception {
@@ -18,24 +17,20 @@ public class BagTest {
     }
 
     @Test
-    public void testGetContents() {
+    public void addToWhite() {
         ArrayList<Integer> testContents = new ArrayList<Integer>();
         ArrayList<Integer> expectedContents = new ArrayList<Integer>();
+
         for (int i = 0; i < 5; i++) {
             testContents.add(i);
             expectedContents.add(i);
         }
-        Bag testBag = new Bag(testContents, "testBag");
-        assertEquals(expectedContents, testBag.getContents());
-    }
 
-    @Test
-    public void testGetBagName() {
-        ArrayList<Integer> testContents = new ArrayList<Integer>();
-        for (int i = 0; i < 5; i++)
-            testContents.add(i);
-        Bag testBag = new Bag(testContents, "myBag");
-        assertEquals("myBag", testBag.getBagName());
-    }
+        WhiteBag testWhite = new WhiteBag(testContents, "myWhite");
+        int pebble = 5;
+        expectedContents.add(pebble);
+        testWhite.addToWhite(pebble);
+        assertEquals(expectedContents, testWhite.contents);
 
+    }
 }

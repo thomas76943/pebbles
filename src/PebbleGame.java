@@ -88,7 +88,9 @@ public class PebbleGame {
                 System.exit(0);
             }
             f = new File(bagFile);
-        } while (!(f.isFile()) || !(f.canRead()) || f.isDirectory()); //File Validation Checks
+            System.out.println(f.length());
+
+        } while (!(f.isFile()) || !(f.canRead()) || f.isDirectory() || !(f.length()>0)); //File Validation Checks
         ArrayList<Integer> bag0Range = readFile(bagFile); //File passed into readFile() method
 
         //Do-While structures are used here to ensure the inputs are asked at least once
@@ -101,7 +103,9 @@ public class PebbleGame {
                 System.exit(0);
             }
             f = new File(bagFile);
-        } while (!(f.isFile()) || !(f.canRead()) || f.isDirectory()); //File Validation Checks
+            System.out.println(f.length());
+
+        } while (!(f.isFile()) || !(f.canRead()) || f.isDirectory() || !(f.length()>0) ); //File Validation Checks
         ArrayList<Integer> bag1Range = readFile(bagFile); //File passed into readFile() method
 
         //Do-While structures are used here to ensure the inputs are asked at least once
@@ -114,7 +118,8 @@ public class PebbleGame {
                 System.exit(0);
             }
             f = new File(bagFile);
-        } while (!(f.isFile()) || !(f.canRead()) || f.isDirectory()); //File Validation Checks
+            System.out.println(f.length());
+        } while (!(f.isFile()) || !(f.canRead()) || f.isDirectory() || !(f.length()>0)); //File Validation Checks
         ArrayList<Integer> bag2Range = readFile(bagFile); //File passed into readFile() method
 
         //Ranges of values taken by Black Bags 0, 1 and 2 are passed into initialiseBags()
@@ -188,19 +193,19 @@ public class PebbleGame {
 
         //Black Bag sizes must be at least 11 times the number of players
         while (contents0.size() < playerNum * 11) {
-            System.out.println("Bag 0 was too small. " + "Size: " + contents0.size() + ". Adding again.");
+            //System.out.println("Bag 0 was too small. " + "Size: " + contents0.size() + ". Adding again.");
             contents0.addAll(range0);
         }
 
         //Black Bag sizes must be at least 11 times the number of players
         while (contents1.size() < playerNum * 11) {
-            System.out.println("Bag 1 was too small. " + "Size: " + contents1.size() + ". Adding again.");
+            //System.out.println("Bag 1 was too small. " + "Size: " + contents1.size() + ". Adding again.");
             contents1.addAll(range1);
         }
 
         //Black Bag sizes must be at least 11 times the number of players
         while (contents2.size() < playerNum * 11) {
-            System.out.println("Bag 2 was too small. " + "Size: " + contents2.size() + ". Adding again.");
+            //System.out.println("Bag 2 was too small. " + "Size: " + contents2.size() + ". Adding again.");
             contents2.addAll(range2);
         }
 

@@ -12,6 +12,10 @@ class BlackBag extends Bag {
         this.linkedWhite = linkedWhite;
     }
 
+    public WhiteBag getLinkedWhite() {
+        return linkedWhite;
+    }
+
     public int drawFromBlack() {
 
         if (contents.size() == 0) {
@@ -23,11 +27,6 @@ class BlackBag extends Bag {
         int pebble = contents.get(index);
         contents.remove(index);
         return pebble;
-
-    }
-
-    public WhiteBag getLinkedWhite() {
-        return linkedWhite;
     }
 
     public void fillBlackFromWhite() {
