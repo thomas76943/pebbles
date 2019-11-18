@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 public class Bag {
 
-    public volatile ArrayList<Integer> contents = new ArrayList<Integer>();
+    protected volatile ArrayList<Integer> contents = new ArrayList<Integer>();
     private String bagName;
 
     public Bag (ArrayList<Integer> contents, String bagName) {
