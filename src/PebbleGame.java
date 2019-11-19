@@ -63,11 +63,11 @@ public class PebbleGame {
             f1 = game.getBagFileLocations(0);
 
         File f2 = game.getBagFileLocations(1);
-        while (!game.readFile(f1, pebbleRange1))
+        while (!game.readFile(f2, pebbleRange1))
             f2 = game.getBagFileLocations(1);
 
         File f3 = game.getBagFileLocations(2);
-        while (!game.readFile(f1, pebbleRange2))
+        while (!game.readFile(f3, pebbleRange2))
             f3 = game.getBagFileLocations(2);
 
         //Lists of values taken by Black Bags 0, 1 and 2 are passed into initialiseBags()
@@ -118,7 +118,7 @@ public class PebbleGame {
     }
 
     /**
-     * This method employs a FileReaader object that is passed into a BufferedReader object. The bagFile is read and
+     * This method employs a FileReader object that is passed into a BufferedReader object. The bagFile is read and
      * split at every comma value. The range ArrayList< Integer> is added to throughout and cleared if any illegal
      * cases are found. This method provides further validation checks: that a pebble can only be an integer and it
      * ensures only values greater than 0 are considered.
@@ -315,12 +315,12 @@ public class PebbleGame {
 
         if (bag instanceof BlackBag) {
             //The Bag being a BlackBag means a pebble is being drawn
-            moveLog = "player" + player.playerNum + " has drawn a " + pebble + " from bag " + bag.getBagName() + "\n";
+            moveLog = "player" + player.playerNum + " has drawn a " + pebble + " from " + bag.getBagName() + "\n";
 
         }
         else if (bag instanceof WhiteBag) {
             //The Bag being a WhiteBag means a pebble is being discarded
-            moveLog = "player" + player.playerNum + " has discarded a " + pebble + " to bag " + bag.getBagName() + "\n";
+            moveLog = "player" + player.playerNum + " has discarded a " + pebble + " to " + bag.getBagName() + "\n";
         }
 
         try {
