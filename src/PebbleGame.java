@@ -95,7 +95,7 @@ public class PebbleGame {
      * it is not a directory and it is not empty. The user may exit by entering "E'/'e'.
      * @param bagNum - The number corresponding to the first, second or third Black Bag.
      */
-    private File getBagFileLocations(int bagNum) {
+    public File getBagFileLocations(int bagNum) {
 
         Scanner input = new Scanner(System.in);
         File f;
@@ -126,7 +126,7 @@ public class PebbleGame {
      * @param range - The ArrayList to which the pebbles are added
      * @return result - The method returns the ArrayList of values that pebbles can be generated from
      */
-    private boolean readFile(File bagFile, ArrayList<Integer> range) {
+    public boolean readFile(File bagFile, ArrayList<Integer> range) {
 
         //BufferedReader makes use of FileReader. Try-Catch exists to catch any file-related IOException
         try (BufferedReader r = new BufferedReader(new FileReader(bagFile))) {
@@ -176,7 +176,7 @@ public class PebbleGame {
      * @param range2 - the contents of the csv/txt file for Black Bag 2 / Z
      * @param playerNum - the number of players in the game, used to determine the minimum size for the Black Bags
      */
-    private void initialiseBags(ArrayList<Integer> range0, ArrayList<Integer> range1,
+    public void initialiseBags(ArrayList<Integer> range0, ArrayList<Integer> range1,
                                 ArrayList<Integer> range2, int playerNum) {
 
         ArrayList<Integer> contents0 = range0;
@@ -220,7 +220,7 @@ public class PebbleGame {
      * the lastBlackUsed HashMap for their next move. checkWin(Player player) is called after a pebble is drawn.
      * @param player - the current player whose turn it is
      */
-    private void takeTurn(Player player) {
+    public void takeTurn(Player player) {
 
         Random r = new Random();
 
@@ -308,7 +308,7 @@ public class PebbleGame {
      * @param pebble - the pebble being drawn/discarded
      * @param bag - the bag that the pebble is being drawn from/discarded to
      */
-    private void writeToFile(Player player, int pebble, Bag bag) {
+    public void writeToFile(Player player, int pebble, Bag bag) {
 
         String moveLog = "";
         String handLog = "player" + player.playerNum + " hand is " + player.hand + "\n";
@@ -338,7 +338,7 @@ public class PebbleGame {
      * combined total size of pebbles in the player's hand is exactly 100.
      * @param player - the player whose hand is being evaluated
      */
-    private void checkWin(Player player) {
+    public void checkWin(Player player) {
         int total = 0;
         //Values of Pebbles in player's hand are summed
         for (int i = 0; i <= player.hand.size() - 1; i++) {
@@ -351,7 +351,7 @@ public class PebbleGame {
         }
     }
 
-    private static class Player implements Runnable {
+    public static class Player implements Runnable {
 
         private PebbleGame game;
         private int playerNum;

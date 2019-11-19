@@ -11,8 +11,7 @@ public class PebbleGameTest {
 
     @Before
     public void setUp() throws Exception {
-
-
+        PebbleGame game = new PebbleGame();
     }
 
     @Test(expected = NumberFormatException.class)
@@ -20,7 +19,6 @@ public class PebbleGameTest {
         int playerNum;
         String playerNumS = "three";
         playerNum = Integer.parseInt(playerNumS);
-
     }
 
     @Test(expected = NumberFormatException.class)
@@ -39,7 +37,6 @@ public class PebbleGameTest {
         String playerNumS = "";
         playerNum = Integer.parseInt(playerNumS);
 
-
     }
 
     @Test
@@ -56,6 +53,14 @@ public class PebbleGameTest {
         hand.add(13);
         hand.add(14);
         hand.add(15);
+
+
+        PebbleGame testGame = new PebbleGame();
+        Class player = PebbleGame.Player.class;
+        PebbleGame.Player testPlayer = new PebbleGame.Player(testGame, 0, 1, "testOutput.txt");
+        //testPlayer.h
+
+        testGame.checkWin(testPlayer);
 
         //Values of Pebbles in player's hand are summed
         for (int i = 0; i <= hand.size() - 1; i++) {

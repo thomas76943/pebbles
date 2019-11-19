@@ -9,8 +9,16 @@ import static org.junit.Assert.*;
 
 public class BagTest {
 
+    Bag testBag;
+
     @Before
     public void setUp() throws Exception {
+
+        ArrayList<Integer> testContents = new ArrayList<Integer>();
+        WhiteBag testWhite = new WhiteBag(testContents, "myWhite");
+        for (int i = 0; i < 5; i++)
+            testContents.add(i);
+        testBag = new BlackBag(testContents, "myBag", testWhite); ;
     }
 
     @After
@@ -19,23 +27,11 @@ public class BagTest {
 
     @Test
     public void testGetContents() {
-        ArrayList<Integer> testContents = new ArrayList<Integer>();
-        ArrayList<Integer> expectedContents = new ArrayList<Integer>();
-        for (int i = 0; i < 5; i++) {
-            testContents.add(i);
-            expectedContents.add(i);
-        }
-        Bag testBag = new Bag(testContents, "testBag");
-        assertEquals(expectedContents, testBag.getContents());
+        assertEquals(Arrays.asList(0,1,2,3,4), testBag.getContents());
     }
 
     @Test
     public void testGetBagName() {
-        ArrayList<Integer> testContents = new ArrayList<Integer>();
-        for (int i = 0; i < 5; i++)
-            testContents.add(i);
-        Bag testBag = new Bag(testContents, "myBag");
         assertEquals("myBag", testBag.getBagName());
     }
-
 }
