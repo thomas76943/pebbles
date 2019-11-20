@@ -134,7 +134,7 @@ public class PebbleGame {
             for (String line : lines) {
                 if (line == "") {
                     //Further validation checks: value must be an integer
-                    System.out.println("All pebbles must be integers greater than 0");
+                    System.out.println("All pebbles must be integers and greater than 0");
                     output.clear();
                     return false;
                 }
@@ -145,19 +145,19 @@ public class PebbleGame {
                         output.add(number);
                     }
                     else {
-                        System.out.println("All pebbles must be integers greater than 0");
+                        System.out.println("All pebbles > 0");
                         output.clear();
                         return false;
                     }
                 } catch (NumberFormatException e) {
-                    System.out.println("All pebbles must be integers greater than 0");
+                    System.out.println("NumberFormatException. Must be Integer > 0");
                     output.clear();
                     return false;
                 }
             }
         }
         catch ( IOException e)  {
-            System.out.println("BufferedReader/FileReader Error Occurred");
+            System.out.println("BufferedReader/FileReader Error Occurred. File May Not Exist");
             output.clear();
             return false;
         }
@@ -177,9 +177,9 @@ public class PebbleGame {
     public void initialiseBags(ArrayList<Integer> range0, ArrayList<Integer> range1,
                                 ArrayList<Integer> range2, int playerNum) {
 
-        ArrayList<Integer> contents0 = range0;
-        ArrayList<Integer> contents1 = range1;
-        ArrayList<Integer> contents2 = range2;
+        ArrayList<Integer> contents0 = new ArrayList<Integer>();
+        ArrayList<Integer> contents1 = new ArrayList<Integer>();
+        ArrayList<Integer> contents2 = new ArrayList<Integer>();
 
         //Black Bag sizes must be at least 11 times the number of players
         while (contents0.size() < playerNum * 11) {
@@ -336,7 +336,7 @@ public class PebbleGame {
      * combined total size of pebbles in the player's hand is exactly 100.
      * @param player - the player whose hand is being evaluated
      */
-    public boolean checkWin(Player player) {
+    public void checkWin(Player player) {
         int total = 0;
         //Values of Pebbles in player's hand are summed
         for (int i = 0; i <= player.hand.size() - 1; i++) {
@@ -346,9 +346,7 @@ public class PebbleGame {
             //Win condition is met
             System.out.println("Player " + player.playerNum + " has won. Hand: " + player.hand);
             gameWon.set(true);
-            return true;
         }
-        return false;
     }
 
     public static class Player implements Runnable {
