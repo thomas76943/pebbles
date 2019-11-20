@@ -31,4 +31,12 @@ public class Bag {
         return bagName;
     }
 
+
+    /**
+     * This method is a setter for the ArrayList< Integer> contents attribute.
+     */
+    public void setContents(ArrayList<Integer> newContents) {
+        contents = newContents;
+    }
+
 }

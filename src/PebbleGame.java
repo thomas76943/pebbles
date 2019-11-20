@@ -33,29 +33,21 @@ public class PebbleGame {
 
         final PebbleGame game = new PebbleGame();
         int playerNum = 0;
+        boolean validPlayerNum = false;
         ArrayList<Integer> pebbles0 = new ArrayList<Integer>();
         ArrayList<Integer> pebbles1 = new ArrayList<Integer>();
         ArrayList<Integer> pebbles2 = new ArrayList<Integer>();
 
-        Scanner input = new Scanner(System.in);
-        while (true) {
-            try {
-                System.out.println("Enter Number of Players (1-10): ");
-                String playerNumS = input.nextLine();
-                if (playerNumS.equalsIgnoreCase("e")) {
-                    System.out.println("Exiting");
-                    System.exit(0);
-                }
-                playerNum = Integer.parseInt(playerNumS);
+        System.out.println("Welcome to PebbleGame.");
+        System.out.println("You will be asked to enter the number of players.");
+        System.out.println("You will then be asked for the locations of three files containing comma separated integers for the pebble weights.");
+        System.out.println("The game will then be simulated.");
+        System.out.println("Every move taken by each player will be written to files in this directory.");
+        System.out.println("Entering 'e'/'E' at any input will exit the program.");
 
-                if (playerNum < 1 || playerNum > 10)
-                    throw new NumberFormatException();
-                break;
-
-            } catch (NumberFormatException e) {
-                System.out.println("Must be Integer between 1-10");
-            }
-        }
+        do {
+            validPlayerNum = game.getNumberOfPlayers();
+        } while (!validPlayerNum);
 
         //Call to method to set file locations for pebble sizes
         File f1 = game.getBagFileLocations(0);
@@ -87,7 +79,34 @@ public class PebbleGame {
                 System.out.println("Could not create Output File");
             }
         }
+
+        System.out.println("The game will now be simulated...");
     }
+
+    public boolean getNumberOfPlayers() {
+        Scanner input = new Scanner(System.in);
+        int output = 0;
+
+        try {
+            System.out.println("Enter Number of Players (1-10): ");
+            String playerNumS = input.nextLine();
+            if (playerNumS.equalsIgnoreCase("e")) {
+                System.out.println("Exiting");
+                System.exit(0);
+            }
+            output = Integer.parseInt(playerNumS);
+
+            if (output < 1 || output > 10) {
+                throw new NumberFormatException();
+            }
+
+        } catch (NumberFormatException e) {
+            System.out.println("Must be Integer between 1-10");
+            return false;
+        }
+        return true;
+    }
+
 
     /**
      * This method is called from main() and is used to ask the user for the locations of the files containing the
@@ -226,6 +245,7 @@ public class PebbleGame {
             int index = r.nextInt(player.hand.size());
             int pebble = player.hand.get(index);
             player.hand.remove(index);
+            System.out.println(player.hand);
             BlackBag bb = lastBlackUsed.get(player.playerNum);
             WhiteBag wb = bb.getLinkedWhite(); //Discards pebble to White Bag corresponding to last Black Bag drawn from
             wb.addToWhite(pebble);

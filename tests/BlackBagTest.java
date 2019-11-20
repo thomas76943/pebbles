@@ -31,7 +31,7 @@ public class BlackBagTest {
 
     @Test
     public void testGetLinkedWhite() {
-        assertEquals("sorry", testWhite, testBlack.getLinkedWhite());
+        assertEquals(testWhite, testBlack.getLinkedWhite());
     }
 
     @Test
@@ -56,11 +56,13 @@ public class BlackBagTest {
         WhiteBag testWhiteFull = new WhiteBag(expectedContents, "testWhiteFull");
         testBlack.fillBlackFromWhite();
         assertEquals(expectedContents, testBlack.getContents());
+        assertEquals(new ArrayList<Integer>(), testWhite.getContents());
     }
 
     @Test
     public void testDrawFromBlackAndFillBlackFromWhite() {
         ArrayList<Integer> drawAndRefill = new ArrayList<>();
+        //testWhite.addToWhite(5);
         testBlack = new BlackBag(drawAndRefill, "testBlackDrawAndRefill", testWhite);
         testBlack.drawFromBlack();
         assertEquals(new ArrayList<Integer>(), testWhite.getContents());

@@ -2,10 +2,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.Assert.*;
@@ -28,6 +29,10 @@ public class PebbleGameTest {
         hand = new ArrayList<>();
     }
 
+    @Test public void testGetNumberOfPlayers() {
+        //testGame.getNumberOfPlayers();
+    }
+
     @Test
     public void testGetBagLocations() throws Exception {
         String emptyFilePath = "EmptyFile.csv";
@@ -40,7 +45,6 @@ public class PebbleGameTest {
         File fileWithLetter = new File("FileContainingLetter.csv");
         File fileWithZero = new File("FileContaining0.csv");
         File fileWithInvalidFormat = new File("FileWithInvalidFormat.csv");
-        File fileWithInvalidType = new File("FileWithInvalidType.exe");
         File fileDoesNotExist = new File("ThisPathDoesNotExist.csv");
 
         ArrayList<Integer> testReadFileOutput = new ArrayList<Integer>();
@@ -48,9 +52,7 @@ public class PebbleGameTest {
         assertFalse(testGame.readFile(fileWithLetter, testReadFileOutput));
         assertFalse(testGame.readFile(fileWithZero, testReadFileOutput));
         assertFalse(testGame.readFile(fileWithInvalidFormat, testReadFileOutput));
-        //assertFalse(testGame.readFile(fileWithInvalidType, testReadFileOutput));
         assertFalse(testGame.readFile(fileDoesNotExist, testReadFileOutput));
-
     }
 
     @Test
@@ -81,8 +83,72 @@ public class PebbleGameTest {
     }
 
     @Test
-    public void testTakeTurn() throws Exception {
+    public void testTakeFirstTurn() throws Exception {
+        testContents.addAll(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9));
+        hand.clear();
+        testPlayer = new PebbleGame.Player(testGame, 0, 1, "testOutput.txt",hand);
 
+        //Reflection used on PebbleGame's bb0, bb1 and bb2 private attributes
+        Field black0 = Class.forName("PebbleGame").getDeclaredField("bb0");
+        Field black1 = Class.forName("PebbleGame").getDeclaredField("bb1");
+        Field black2 = Class.forName("PebbleGame").getDeclaredField("bb2");
+        Field white0 = Class.forName("PebbleGame").getDeclaredField("wb0");
+        Field white1 = Class.forName("PebbleGame").getDeclaredField("wb1");
+        Field white2 = Class.forName("PebbleGame").getDeclaredField("wb2");
+
+        //Fields made accessible
+        black0.setAccessible(true);
+        black1.setAccessible(true);
+        black2.setAccessible(true);
+        white0.setAccessible(true);
+        white1.setAccessible(true);
+        white2.setAccessible(true);
+
+        //Fields cast into BlackBag and WhiteBag objects
+        WhiteBag wb0 = (WhiteBag) white0.get(testGame);
+        WhiteBag wb1 = (WhiteBag) white1.get(testGame);
+        WhiteBag wb2 = (WhiteBag) white2.get(testGame);
+        black0.set(testGame, new BlackBag(testContents, "testBlack0", wb0));
+        black1.set(testGame, new BlackBag(testContents, "testBlack1", wb1));
+        black2.set(testGame, new BlackBag(testContents, "testBlack2", wb2));
+
+        testGame.takeTurn(testPlayer);
+
+        BlackBag bb0 = (BlackBag) black0.get(testGame);
+        BlackBag bb1 = (BlackBag) black1.get(testGame);
+        BlackBag bb2 = (BlackBag) black2.get(testGame);
+
+        assertEquals(10, hand.size());
+
+        /*
+        BlackBag[] BlackBags = {bb0, bb1, bb2};
+        WhiteBag[] WhiteBags = {wb0, wb1, wb2};
+
+        int blackBagsWithNinePebbles = 0;
+        int blackBagsWithTenPebbles = 0;
+        int whiteBagsWithOnePebble = 0;
+        int whiteBagsWithZeroPebbles = 0;
+
+        for (BlackBag bb : BlackBags) {
+            if (bb.getContents().size() == 9)
+                blackBagsWithNinePebbles += 1;
+            else
+                blackBagsWithTenPebbles += 1;
+        }
+
+        for (WhiteBag wb : WhiteBags) {
+            if (wb.getContents().size() == 1)
+                whiteBagsWithOnePebble += 1;
+            else
+                whiteBagsWithZeroPebbles += 1;
+        }
+
+        assertEquals(1, blackBagsWithNinePebbles);
+        assertEquals(2, blackBagsWithTenPebbles);
+        assertEquals(1, whiteBagsWithOnePebble);
+        assertEquals(2, whiteBagsWithZeroPebbles);
+
+        */
     }
 
     @Test
@@ -91,7 +157,7 @@ public class PebbleGameTest {
     }
 
     @Test
-    public void testCheckWin () throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
+    public void testCheckWin () throws Exception {
         hand.add(50);
         hand.add(30);
         hand.add(20);
@@ -103,6 +169,19 @@ public class PebbleGameTest {
         AtomicBoolean result = (AtomicBoolean) win.get(testGame);
 
         assertTrue(result.get());
+    }
+
+    @Test
+    public void testCheckWinFalse () throws Exception {
+        hand.add(50);
+        testPlayer = new PebbleGame.Player(testGame, 0, 1, "testOutput.txt", hand);
+        testGame.checkWin(testPlayer);
+
+        Field win = Class.forName("PebbleGame").getDeclaredField("gameWon");
+        win.setAccessible(true);
+        AtomicBoolean result = (AtomicBoolean) win.get(testGame);
+
+        assertFalse(result.get());
     }
 
     @After

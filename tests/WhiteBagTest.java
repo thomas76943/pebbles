@@ -24,12 +24,8 @@ public class WhiteBagTest {
     }
 
     @Test
-    public void addToWhite() {
-        int pebble = 1;
-        testWhite.addToWhite(pebble);
-        pebble = 5;
-        testWhite.addToWhite(pebble);
-        assertEquals(Arrays.asList(1,5), testWhite.contents);
-
+    public void addToWhite() { ;;
+        testWhite.addToWhite(10);
+        assertEquals(Arrays.asList(10), testWhite.contents);
     }
 }
