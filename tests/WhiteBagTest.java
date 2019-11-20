@@ -17,15 +17,16 @@ public class WhiteBagTest {
         testWhite = new WhiteBag(testContents, "testWhite");
     }
 
+    @Test
+    public void addToWhite() { ;;
+        testWhite.addToWhite(10);
+        assertEquals(Arrays.asList(10), testWhite.contents);
+    }
+
     @After
     public void tearDown() throws Exception {
         testWhite = null;
         assertNull(testWhite);
     }
 
-    @Test
-    public void addToWhite() { ;;
-        testWhite.addToWhite(10);
-        assertEquals(Arrays.asList(10), testWhite.contents);
-    }
 }

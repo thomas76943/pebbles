@@ -14,6 +14,7 @@ public class PebbleGame {
     private AtomicInteger currentPlayer = new AtomicInteger(1);
     private AtomicBoolean gameWon = new AtomicBoolean(false);
     private HashMap<Integer, BlackBag> lastBlackUsed = new HashMap<Integer, BlackBag>();
+    private int playerNum;
     private BlackBag bb0;
     private BlackBag bb1;
     private BlackBag bb2;
@@ -22,17 +23,16 @@ public class PebbleGame {
     private WhiteBag wb2;
 
     /**
-     * main() Method: Main Thread of the Program. The program's instance of PebbleGame is created here. A user input for
-     * the number of players (that must be an integer) is taken here. Entering 'E'/'e' exits the program. The method
-     * getBagFileLocations() is called from here until the inputs are seen as valid and then initialiseBags is then
-     * called. Players are then created and corresponding threads are set up alongside the player move output files.
+     * main() Method: Main Thread of the Program. The program's instance of PebbleGame is created here.
+     * getNumberOfPlayers is called here. Entering 'E'/'e' exits the program. The method getBagFileLocations() is called
+     * from here until the inputs are seen as valid and then initialiseBags is then called.
+     * Players are then created and corresponding threads are set up alongside the player move output files.
      * @param args
      * @throws InterruptedException
      */
     public static void main(String[] args) throws InterruptedException {
 
         final PebbleGame game = new PebbleGame();
-        int playerNum = 0;
         boolean validPlayerNum = false;
         ArrayList<Integer> pebbles0 = new ArrayList<Integer>();
         ArrayList<Integer> pebbles1 = new ArrayList<Integer>();
@@ -45,9 +45,8 @@ public class PebbleGame {
         System.out.println("Every move taken by each player will be written to files in this directory.");
         System.out.println("Entering 'e'/'E' at any input will exit the program.");
 
-        do {
-            validPlayerNum = game.getNumberOfPlayers();
-        } while (!validPlayerNum);
+        game.playerNum = game.getNumberOfPlayers();
+
 
         //Call to method to set file locations for pebble sizes
         File f1 = game.getBagFileLocations(0);
@@ -64,11 +63,12 @@ public class PebbleGame {
 
         //Lists of values taken by Black Bags 0, 1 and 2 are passed into initialiseBags()
         //along with the number of players in the game
-        game.initialiseBags(pebbles0, pebbles1, pebbles2, playerNum);
 
-        for (int i = 1; i <= playerNum; i++) {
+        game.initialiseBags(pebbles0, pebbles1, pebbles2, game.playerNum);
+
+        for (int i = 1; i <= game.playerNum; i++) {
             String outputFileName = "player" + i + "_output.txt";
-            Player player = new Player(game, i, playerNum, outputFileName, new ArrayList<Integer>());
+            Player player = new Player(game, i, game.playerNum, outputFileName, new ArrayList<Integer>());
             Thread playerThread = new Thread(player);
             playerThread.start();
             try {
@@ -79,34 +79,37 @@ public class PebbleGame {
                 System.out.println("Could not create Output File");
             }
         }
-
-        System.out.println("The game will now be simulated...");
     }
 
-    public boolean getNumberOfPlayers() {
+    /**
+     * This method returns the boolean result of validating the user's input for how many players they would
+     * like in the game. Entering 'e'/'E' will allow the user to exit the program. If the user enters a character that
+     * is not an integer or an integer that is not between 1-10, the program will ask again.
+     * @return
+     */
+    public int getNumberOfPlayers() {
         Scanner input = new Scanner(System.in);
         int output = 0;
+        while (true) {
+            try {
+                System.out.println("Enter Number of Players (1-10): ");
+                String playerNumS = input.nextLine();
+                if (playerNumS.equalsIgnoreCase("e")) {
+                    System.out.println("Exiting");
+                    System.exit(0);
+                }
+                output = Integer.parseInt(playerNumS);
 
-        try {
-            System.out.println("Enter Number of Players (1-10): ");
-            String playerNumS = input.nextLine();
-            if (playerNumS.equalsIgnoreCase("e")) {
-                System.out.println("Exiting");
-                System.exit(0);
+                if (output < 1 || output > 10) {
+                    throw new NumberFormatException();
+                }
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Must be Integer between 1-10");
             }
-            output = Integer.parseInt(playerNumS);
-
-            if (output < 1 || output > 10) {
-                throw new NumberFormatException();
-            }
-
-        } catch (NumberFormatException e) {
-            System.out.println("Must be Integer between 1-10");
-            return false;
         }
-        return true;
+        return output;
     }
-
 
     /**
      * This method is called from main() and is used to ask the user for the locations of the files containing the
@@ -245,7 +248,6 @@ public class PebbleGame {
             int index = r.nextInt(player.hand.size());
             int pebble = player.hand.get(index);
             player.hand.remove(index);
-            System.out.println(player.hand);
             BlackBag bb = lastBlackUsed.get(player.playerNum);
             WhiteBag wb = bb.getLinkedWhite(); //Discards pebble to White Bag corresponding to last Black Bag drawn from
             wb.addToWhite(pebble);

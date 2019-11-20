@@ -6,6 +6,5 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @SuiteClasses({PebbleGameTest.class, BagTest.class, BlackBagTest.class, WhiteBagTest.class})
 
-
 public class PebbleGameTestSuite {
 }
