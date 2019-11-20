@@ -13,16 +13,16 @@ public class BagTest {
 
     @Before
     public void setUp() throws Exception {
-
         ArrayList<Integer> testContents = new ArrayList<Integer>();
-        WhiteBag testWhite = new WhiteBag(testContents, "myWhite");
         for (int i = 0; i < 5; i++)
             testContents.add(i);
-        testBag = new BlackBag(testContents, "myBag", testWhite); ;
+        testBag = new Bag(testContents, "myBag"); ;
     }
 
     @After
     public void tearDown() throws Exception {
+        testBag = null;
+        assertNull(testBag);
     }
 
     @Test

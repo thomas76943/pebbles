@@ -33,14 +33,14 @@ public class PebbleGame {
 
         final PebbleGame game = new PebbleGame();
         int playerNum = 0;
-        ArrayList<Integer> pebbleRange0 = new ArrayList<Integer>();
-        ArrayList<Integer> pebbleRange1 = new ArrayList<Integer>();
-        ArrayList<Integer> pebbleRange2 = new ArrayList<Integer>();
+        ArrayList<Integer> pebbles0 = new ArrayList<Integer>();
+        ArrayList<Integer> pebbles1 = new ArrayList<Integer>();
+        ArrayList<Integer> pebbles2 = new ArrayList<Integer>();
 
         Scanner input = new Scanner(System.in);
         while (true) {
             try {
-                System.out.println("Enter Number of Players (1-25): ");
+                System.out.println("Enter Number of Players (1-10): ");
                 String playerNumS = input.nextLine();
                 if (playerNumS.equalsIgnoreCase("e")) {
                     System.out.println("Exiting");
@@ -48,35 +48,35 @@ public class PebbleGame {
                 }
                 playerNum = Integer.parseInt(playerNumS);
 
-                if (playerNum < 1 || playerNum > 25)
+                if (playerNum < 1 || playerNum > 10)
                     throw new NumberFormatException();
                 break;
 
             } catch (NumberFormatException e) {
-                System.out.println("Must be Integer between 1-25");
+                System.out.println("Must be Integer between 1-10");
             }
         }
 
         //Call to method to set file locations for pebble sizes
         File f1 = game.getBagFileLocations(0);
-        while (!game.readFile(f1, pebbleRange0))
+        while (!game.readFile(f1, pebbles0))
             f1 = game.getBagFileLocations(0);
 
         File f2 = game.getBagFileLocations(1);
-        while (!game.readFile(f2, pebbleRange1))
+        while (!game.readFile(f2, pebbles1))
             f2 = game.getBagFileLocations(1);
 
         File f3 = game.getBagFileLocations(2);
-        while (!game.readFile(f3, pebbleRange2))
+        while (!game.readFile(f3, pebbles2))
             f3 = game.getBagFileLocations(2);
 
         //Lists of values taken by Black Bags 0, 1 and 2 are passed into initialiseBags()
         //along with the number of players in the game
-        game.initialiseBags(pebbleRange0, pebbleRange1, pebbleRange2, playerNum);
+        game.initialiseBags(pebbles0, pebbles1, pebbles2, playerNum);
 
         for (int i = 1; i <= playerNum; i++) {
             String outputFileName = "player" + i + "_output.txt";
-            Player player = new Player(game, i, playerNum, outputFileName);
+            Player player = new Player(game, i, playerNum, outputFileName, new ArrayList<Integer>());
             Thread playerThread = new Thread(player);
             playerThread.start();
             try {
@@ -112,21 +112,19 @@ public class PebbleGame {
             }
             f = new File(bagFile);
         } while (!(f.isFile()) || !(f.canRead()) || f.isDirectory() || !(f.length()>0)); //File Validation Checks
-
         return f;
-
     }
 
     /**
      * This method employs a FileReader object that is passed into a BufferedReader object. The bagFile is read and
-     * split at every comma value. The range ArrayList< Integer> is added to throughout and cleared if any illegal
+     * split at every comma value. The output ArrayList< Integer> is added to throughout and cleared if any illegal
      * cases are found. This method provides further validation checks: that a pebble can only be an integer and it
      * ensures only values greater than 0 are considered.
      * @param bagFile - The file containing the values of pebbles
-     * @param range - The ArrayList to which the pebbles are added
+     * @param output - The ArrayList to which the pebbles are added
      * @return result - The method returns the ArrayList of values that pebbles can be generated from
      */
-    public boolean readFile(File bagFile, ArrayList<Integer> range) {
+    public boolean readFile(File bagFile, ArrayList<Integer> output) {
 
         //BufferedReader makes use of FileReader. Try-Catch exists to catch any file-related IOException
         try (BufferedReader r = new BufferedReader(new FileReader(bagFile))) {
@@ -137,30 +135,30 @@ public class PebbleGame {
                 if (line == "") {
                     //Further validation checks: value must be an integer
                     System.out.println("All pebbles must be integers greater than 0");
-                    range.clear();
+                    output.clear();
                     return false;
                 }
                 try {
                     int number = Integer.parseInt(line);
                     if (number > 0) {
                         //Further validation checks: value only added if greater than 0
-                        range.add(number);
+                        output.add(number);
                     }
                     else {
                         System.out.println("All pebbles must be integers greater than 0");
-                        range.clear();
+                        output.clear();
                         return false;
                     }
                 } catch (NumberFormatException e) {
                     System.out.println("All pebbles must be integers greater than 0");
-                    range.clear();
+                    output.clear();
                     return false;
                 }
             }
         }
         catch ( IOException e)  {
             System.out.println("BufferedReader/FileReader Error Occurred");
-            range.clear();
+            output.clear();
             return false;
         }
         return true;
@@ -338,7 +336,7 @@ public class PebbleGame {
      * combined total size of pebbles in the player's hand is exactly 100.
      * @param player - the player whose hand is being evaluated
      */
-    public void checkWin(Player player) {
+    public boolean checkWin(Player player) {
         int total = 0;
         //Values of Pebbles in player's hand are summed
         for (int i = 0; i <= player.hand.size() - 1; i++) {
@@ -348,7 +346,9 @@ public class PebbleGame {
             //Win condition is met
             System.out.println("Player " + player.playerNum + " has won. Hand: " + player.hand);
             gameWon.set(true);
+            return true;
         }
+        return false;
     }
 
     public static class Player implements Runnable {
@@ -367,11 +367,12 @@ public class PebbleGame {
          * @param maxPlayers - total number of players in the game
          * @param outputFileName - name of current player's output file
          */
-        public Player (PebbleGame game, int playerNum, int maxPlayers, String outputFileName) {
+        public Player (PebbleGame game, int playerNum, int maxPlayers, String outputFileName, ArrayList<Integer> hand) {
             this.game = game;
             this.playerNum = playerNum;
             this.maxPlayers = maxPlayers;
             this.outputFileName = outputFileName;
+            this.hand = hand;
         }
 
         /**
