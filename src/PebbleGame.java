@@ -7,11 +7,9 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class PebbleGame {
 
-    private AtomicInteger currentPlayer = new AtomicInteger(1);
     private AtomicBoolean gameWon = new AtomicBoolean(false);
     private HashMap<Integer, BlackBag> lastBlackUsed = new HashMap<Integer, BlackBag>();
     private int playerNum;
@@ -30,10 +28,9 @@ public class PebbleGame {
      * @param args
      * @throws InterruptedException
      */
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
 
         final PebbleGame game = new PebbleGame();
-        boolean validPlayerNum = false;
         ArrayList<Integer> pebbles0 = new ArrayList<Integer>();
         ArrayList<Integer> pebbles1 = new ArrayList<Integer>();
         ArrayList<Integer> pebbles2 = new ArrayList<Integer>();
@@ -46,7 +43,6 @@ public class PebbleGame {
         System.out.println("Entering 'e'/'E' at any input will exit the program.");
 
         game.playerNum = game.getNumberOfPlayers();
-
 
         //Call to method to set file locations for pebble sizes
         File f1 = game.getBagFileLocations(0);
@@ -63,14 +59,15 @@ public class PebbleGame {
 
         //Lists of values taken by Black Bags 0, 1 and 2 are passed into initialiseBags()
         //along with the number of players in the game
-
         game.initialiseBags(pebbles0, pebbles1, pebbles2, game.playerNum);
 
         for (int i = 1; i <= game.playerNum; i++) {
+
             String outputFileName = "player" + i + "_output.txt";
             Player player = new Player(game, i, game.playerNum, outputFileName, new ArrayList<Integer>());
             Thread playerThread = new Thread(player);
             playerThread.start();
+
             try {
                 FileOutputStream fos = new FileOutputStream(outputFileName);
                 OutputStreamWriter osw = new OutputStreamWriter(fos, "utf-8");
@@ -79,6 +76,7 @@ public class PebbleGame {
                 System.out.println("Could not create Output File");
             }
         }
+        System.out.println("Game is running... Please wait...");
     }
 
     /**
@@ -94,20 +92,23 @@ public class PebbleGame {
             try {
                 System.out.println("Enter Number of Players (1-10): ");
                 String playerNumS = input.nextLine();
+                //Program Allows User to Exit
                 if (playerNumS.equalsIgnoreCase("e")) {
                     System.out.println("Exiting");
                     System.exit(0);
                 }
                 output = Integer.parseInt(playerNumS);
-
+                //Input integer range validation
                 if (output < 1 || output > 10) {
                     throw new NumberFormatException();
                 }
                 break;
+                //Input type validation via catching NumberFormatException
             } catch (NumberFormatException e) {
                 System.out.println("Must be Integer between 1-10");
             }
         }
+        //Only returns output if input is a valid integer from 1-10
         return output;
     }
 
@@ -133,7 +134,8 @@ public class PebbleGame {
                 System.exit(0);
             }
             f = new File(bagFile);
-        } while (!(f.isFile()) || !(f.canRead()) || f.isDirectory() || !(f.length()>0)); //File Validation Checks
+            //File Validation Checks: invalid if location is not a file, not readable, a directory or of length 0
+        } while (!(f.isFile()) || !(f.canRead()) || f.isDirectory() || !(f.length()>0));
         return f;
     }
 
@@ -146,7 +148,7 @@ public class PebbleGame {
      * @param output - The ArrayList to which the pebbles are added
      * @return result - The method returns the ArrayList of values that pebbles can be generated from
      */
-    public boolean readFile(File bagFile, ArrayList<Integer> output) {
+    boolean readFile(File bagFile, ArrayList<Integer> output) {
 
         //BufferedReader makes use of FileReader. Try-Catch exists to catch any file-related IOException
         try (BufferedReader r = new BufferedReader(new FileReader(bagFile))) {
@@ -197,29 +199,23 @@ public class PebbleGame {
      * @param playerNum - the number of players in the game, used to determine the minimum size for the Black Bags
      */
     public void initialiseBags(ArrayList<Integer> range0, ArrayList<Integer> range1,
-                                ArrayList<Integer> range2, int playerNum) {
+                               ArrayList<Integer> range2, int playerNum) {
 
         ArrayList<Integer> contents0 = new ArrayList<Integer>();
         ArrayList<Integer> contents1 = new ArrayList<Integer>();
         ArrayList<Integer> contents2 = new ArrayList<Integer>();
 
         //Black Bag sizes must be at least 11 times the number of players
-        while (contents0.size() < playerNum * 11) {
-            //System.out.println("Bag 0 was too small. " + "Size: " + contents0.size() + ". Adding again.");
+        while (contents0.size() < playerNum * 11)
             contents0.addAll(range0);
-        }
 
         //Black Bag sizes must be at least 11 times the number of players
-        while (contents1.size() < playerNum * 11) {
-            //System.out.println("Bag 1 was too small. " + "Size: " + contents1.size() + ". Adding again.");
+        while (contents1.size() < playerNum * 11)
             contents1.addAll(range1);
-        }
 
         //Black Bag sizes must be at least 11 times the number of players
-        while (contents2.size() < playerNum * 11) {
-            //System.out.println("Bag 2 was too small. " + "Size: " + contents2.size() + ". Adding again.");
+        while (contents2.size() < playerNum * 11)
             contents2.addAll(range2);
-        }
 
         //Three White Bags, A, B and C, are instantiated with empty contents
         wb0 = new WhiteBag(new ArrayList<Integer>(), "Bag A");
@@ -241,83 +237,67 @@ public class PebbleGame {
      * @param player - the current player whose turn it is
      */
     public void takeTurn(Player player) {
-
-        Random r = new Random();
-
-        if (player.hand.size() != 0) { //Checks if hand is not empty: if so, a pebble must be discarded
-            int index = r.nextInt(player.hand.size());
-            int pebble = player.hand.get(index);
-            player.hand.remove(index);
-            BlackBag bb = lastBlackUsed.get(player.playerNum);
-            WhiteBag wb = bb.getLinkedWhite(); //Discards pebble to White Bag corresponding to last Black Bag drawn from
-            wb.addToWhite(pebble);
-            writeToFile(player, pebble, wb); //Records this move in the output file
-        }
-
-        switch (r.nextInt(3)) { //Switch-case structure represents each of the 3 Black Bags
-            case 0:
-                if (player.hand.size() == 0) {
+        if (!gameWon.get()) {
+            Random r = new Random();
+            //Checks if the player's hand is not empty: if so, a pebble must be discarded
+            if (player.hand.size() != 0) {
+                int index = r.nextInt(player.hand.size());
+                int pebble = player.hand.get(index);
+                player.hand.remove(index);
+                //Records this as the Black Bag drawn from
+                BlackBag lastBlack = lastBlackUsed.get(player.playerNum);
+                //Discards pebble to White Bag corresponding to last Black Bag drawn from
+                WhiteBag linkedWhite = lastBlack.getLinkedWhite();
+                linkedWhite.addToWhite(pebble);
+                //Records this move in the output file
+                writeToFile(player, pebble, linkedWhite);
+            }
+            //Checks if the player's hand is empty, if so, it is the start of the game and they are given 10 pebbles
+            if (player.hand.size() == 0) {
+                BlackBag blackBagSelection = selectBlack();
+                synchronized (blackBagSelection) {
                     //Initialising the bag with 10 pebbles from Black Bag 0
                     for (int i = 0; i < 10; i++) {
-                        int pebble = bb0.drawFromBlack();
+                        int pebble = blackBagSelection.drawFromBlack();
                         player.hand.add(pebble);
+                        //Records this as the Black Bag drawn from
+                        lastBlackUsed.put(player.playerNum, blackBagSelection);
                     }
-                    lastBlackUsed.put(player.playerNum, bb0); //Records this Black Bag being drawn from
                 }
-                else {
-                    int pebble = bb0.drawFromBlack();
+            //If the player's hand is not empty, a regular move is being performed and a new pebble must be drawn
+            } else {
+                BlackBag blackBagSelection = selectBlack();
+                synchronized (blackBagSelection) {
+                    int pebble = blackBagSelection.drawFromBlack();
                     player.hand.add(pebble);
-                    lastBlackUsed.put(player.playerNum, bb0); //Records this Black Bag being drawn from
-                    writeToFile(player, pebble, bb0); //Records this move in the output file
+                    //Records this as the Black Bag drawn from
+                    lastBlackUsed.put(player.playerNum, blackBagSelection);
+                    //Records this move in the output file
+                    writeToFile(player, pebble, blackBagSelection);
+                    //Performs a thread-safe check if a win-case is met
+                    if (!gameWon.get())
+                        checkWin(player);
                 }
-                //Prints turn to Console
-                System.out.println("Player " + this.currentPlayer + "'s turn. " + bb0.getBagName()
-                        + " chosen. Hand: " + player.hand);
-                checkWin(player);
-                break;
-
-            case 1:
-                if (player.hand.size() == 0) {
-                    //Initialising the bag with 10 pebbles from Black Bag 1
-                    for (int i = 0; i < 10; i++) {
-                        int pebble = bb1.drawFromBlack();
-                        player.hand.add(pebble);
-                    }
-                    lastBlackUsed.put(player.playerNum, bb1); //Records this Black Bag being drawn from
-                }
-                else {
-                    int pebble = bb1.drawFromBlack();
-                    player.hand.add(pebble);
-                    lastBlackUsed.put(player.playerNum, bb1); //Records this Black Bag being drawn from
-                    writeToFile(player, pebble, bb1); //Records this move in the output file
-                }
-                //Prints turn to Console
-                System.out.println("Player " + this.currentPlayer + "'s turn. " + bb1.getBagName()
-                        + " chosen. Hand: " + player.hand);
-                checkWin(player);
-                break;
-
-            case 2:
-                if (player.hand.size() == 0) {
-                    //Initialising the bag with 10 pebbles from Black Bag 2
-                    for (int i = 0; i < 10; i++) {
-                        int pebble = bb2.drawFromBlack();
-                        player.hand.add(pebble);
-                    }
-                    lastBlackUsed.put(player.playerNum, bb2);; //Records this Black Bag being drawn from
-                }
-                else {
-                    int pebble = bb2.drawFromBlack();
-                    player.hand.add(pebble);
-                    lastBlackUsed.put(player.playerNum, bb2); //Records this Black Bag being drawn from
-                    writeToFile(player, pebble, bb2); //Records this move in the output file
-                }
-                //Prints turn to Console
-                System.out.println("Player " + this.currentPlayer+"'s turn. "+bb2.getBagName()
-                        + " chosen. Hand: " + player.hand);
-                checkWin(player);
-                break;
+            }
         }
+    }
+
+    /**
+     * This method is called from takeTurn() and randomly returns one of the three BlackBag attributes. It does not
+     * take any arguments and has return type BlackBag.
+     * @return - one of the game's BlackBag attributes
+     */
+    public BlackBag selectBlack() {
+        Random r = new Random();
+        switch (r.nextInt(3)) {
+            case 0:
+                return bb0;
+            case 1:
+                return bb1;
+            case 2:
+                return bb2;
+        }
+        return null;
     }
 
     /**
@@ -336,7 +316,6 @@ public class PebbleGame {
         if (bag instanceof BlackBag) {
             //The Bag being a BlackBag means a pebble is being drawn
             moveLog = "player" + player.playerNum + " has drawn a " + pebble + " from " + bag.getBagName() + "\n";
-
         }
         else if (bag instanceof WhiteBag) {
             //The Bag being a WhiteBag means a pebble is being discarded
@@ -368,6 +347,7 @@ public class PebbleGame {
             //Win condition is met
             System.out.println("Player " + player.playerNum + " has won. Hand: " + player.hand);
             gameWon.set(true);
+
         }
     }
 
@@ -388,6 +368,7 @@ public class PebbleGame {
          * @param outputFileName - name of current player's output file
          */
         public Player (PebbleGame game, int playerNum, int maxPlayers, String outputFileName, ArrayList<Integer> hand) {
+
             this.game = game;
             this.playerNum = playerNum;
             this.maxPlayers = maxPlayers;
@@ -397,40 +378,18 @@ public class PebbleGame {
 
         /**
          * This method is called directly from playerThread.start() in the main thread. A single instance of PebbleGame
-         * is passed between the players. If the game has not been won and it is the current player's turn, access to
-         * the game object is locked from all other threads. While locked, takeTurn() is called and the current player
-         * is incremented. If it is the last player's turn, this counter is reset to 0. After completing the move, the
-         * lock on the game object is lifted and the other threads can begin listening to see if it is their turn next.
-          */
+         * is passed between the players. If the game has not been won, the game.takeTurn() method is called which in
+         * turn calls checkWin(). If checkWin() sets the game.gameWon attribute to true, the conditions are not met:
+         * the threads are interrupted and the system is exited.
+         */
         public void run() {
             //Checks if the game is not won before allowing a move
             while (!game.gameWon.get()) {
-                //Checks if it is current player's turn because all Threads are listening
-                if (this.playerNum == game.currentPlayer.get()) {
-                    //Locks the game object to the current player, nobody else has access
-                    synchronized (game) {
-                            try {
-                                //Main game play. Increments the current player after a move is made
-                                game.takeTurn(this);
-                                game.currentPlayer.getAndIncrement();
-                                //Checks if it is currently the last player's turn and resets the player turn counter
-                                if (this.playerNum == this.maxPlayers) {
-                                    game.currentPlayer.set(1);
-                                    //Releases the lock, all threads are awake
-                                    game.notifyAll();
-                                }
-                                else {
-                                    //Releases the lock by suspending the current Thread
-                                    game.wait();
-                                }
-                            } catch (InterruptedException e) {
-                                System.out.println("Thread Finished: InterruptedException");
-                                e.printStackTrace();
-                            }
-                    }
+                if (!game.gameWon.get()) {
+                    game.takeTurn(this);
                 }
             }
-            //Game is over if this is reached
+            //Condition met if win-case has been found
             Thread.currentThread().interrupt();
             System.exit(0);
         }

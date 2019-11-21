@@ -36,8 +36,9 @@ class BlackBag extends Bag {
 
         //Black Bag filled from Linked White Bag
         if (contents.size() == 0) {
-            fillBlackFromWhite();
-            System.out.println("Black Bag " + this.getBagName() + " Refilled");
+            synchronized (this.getLinkedWhite().getContents()) {
+                fillBlackFromWhite();
+            }
         }
 
         Random r = new Random();
@@ -53,8 +54,10 @@ class BlackBag extends Bag {
      */
     public void fillBlackFromWhite() {
 
-        for (int x : linkedWhite.contents) {
-            contents.add(x);
+        synchronized (contents) {
+            for (int x : linkedWhite.contents) {
+                contents.add(x);
+            }
         }
         linkedWhite.contents.clear();
     }

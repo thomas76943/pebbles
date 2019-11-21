@@ -12,11 +12,14 @@ class WhiteBag extends Bag {
     }
 
     /**
-     * This method adds a given integer (representing a pebble) to the White Bag's contents.
+     * This method adds a given integer (representing a pebble) to the White Bag's contents. It is synchronized as
+     * players may be discarding to a WhiteBag at the same time the WhiteBag is emptying to a BlackBag.
      * @param pebble - the pebble to be added.
      */
     public void addToWhite(int pebble) {
-        contents.add(pebble);
+        synchronized (contents) {
+            contents.add(pebble);
+        };
     }
 
 }

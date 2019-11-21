@@ -1,14 +1,12 @@
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.*;
 
 import java.io.*;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.InputMismatchException;
-import java.util.List;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.Assert.*;
@@ -35,15 +33,14 @@ public class PebbleGameTest {
         String validInput = "5";
         InputStream in = new ByteArrayInputStream(validInput.getBytes());
         System.setIn(in);
-
         //Asserting that a valid number of players is identified
         assertEquals(5, testGame.getNumberOfPlayers());
-
     }
 
     @Test
     public void testBagLocations() throws Exception {
         String validFilePath = "pebblerange_1_20.csv";
+        //Emulating user input with an InputStream
         File validFile = new File(validFilePath);
         InputStream in = new ByteArrayInputStream(validFilePath.getBytes());
         System.setIn(in);

@@ -61,8 +61,8 @@ public class BlackBagTest {
 
     @Test
     public void testDrawFromBlackAndFillBlackFromWhite() {
+        //Combining the above two tests
         ArrayList<Integer> drawAndRefill = new ArrayList<>();
-        //testWhite.addToWhite(5);
         testBlack = new BlackBag(drawAndRefill, "testBlackDrawAndRefill", testWhite);
         testBlack.drawFromBlack();
         assertEquals(new ArrayList<Integer>(), testWhite.getContents());
